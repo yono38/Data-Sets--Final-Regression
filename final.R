@@ -5,7 +5,7 @@ require(lasso2)
 main <- function(){
   # TODO: read in TF's, can use
   # we can access the rows in the ratios matrix by calling ratios[tf[i],]
-  tfs <- scan(file="justTFS.txt", what="character", sep="\n")
+  tfNames <- scan(file="justTFS.txt", what="character", sep="\n")
   
   # TODO: get clusters
   # I'm gonna assume this comes in a matrix of the form
@@ -35,6 +35,17 @@ main <- function(){
   
 }
 
+# A function that loads the data
+tfList <- function(tfNames, ratios){
+  miniList <- list()
+  
+  for (i in 1:length(tfNames)){
+    cat(i, "\n")
+    miniList[[i]] <- ratios[tfNames[i],]
+  }
+  
+  
+}
 
 
 # From here down is homework 5
