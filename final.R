@@ -39,11 +39,19 @@ main <- function(){
 tfList <- function(tfNames, ratios){
   miniList <- list()
   
+  # This loop works
   for (i in 1:length(tfNames)){
-    cat(i, "\n")
+    #cat(i, "\n")
     miniList[[i]] <- ratios[tfNames[i],]
   }
   
+  for (q in 1:length(z[[1]])){
+    rowTotal <- 0
+    for (l in 1:length(z)){
+      rowTotal = rowTotal+z[[l]][q]
+    }
+    cat("Mean is: ", (rowTotal/length(z)), "\n")
+  }
   
 }
 
