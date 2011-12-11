@@ -7,9 +7,8 @@ main <- function(){
   # we can access the rows in the ratios matrix by calling ratios[tf[i],]
   tfNames <- scan(file="justTFS.txt", what="character", sep="\n")
   
-  # TODO: get clusters
-  # I'm gonna assume this comes in a matrix of the form
-  clusters <- 0
+  # Since we don't have the clusters, this function is a placeholder
+  clusters <- getClusters()
   
   # List to store the results
   results <- list()
@@ -35,6 +34,14 @@ main <- function(){
   
 }
 
+getClusters <- function(){
+  load("baa.ratios.rda")
+  clusters <- ratios
+  invisible(clusters)
+  
+}
+
+
 # A function that loads the data
 tfList <- function(tfNames, ratios){
   miniList <- list()
@@ -52,9 +59,23 @@ tfList <- function(tfNames, ratios){
     }
     cat("Mean is: ", (rowTotal/length(z)), "\n")
   }
+    
+  invisible(miniList)
   
 }
 
+  
+getCorrPredictors <- function(y, tfs) {
+  cors <- double()
+	for (i in 1:dim(tfs)[1]) {
+		t = tfs[i,]
+		cors <- append(cors, abs(cor(y, t, use="na.or.complete")))
+	}
+	
+	invisible(tfs[sort(cors, decreasing = T, index.return = T)$ix[1:20],])
+}
+  
+  
 
 # From here down is homework 5
 
@@ -128,7 +149,8 @@ bestFit <- function( x, y, kFolds=5, stepSize = .05, printSteps = FALSE){
   }
   
   cat("The shrinkage parameter t is:", foundT, "\n")
-      
+   
+  # Return this?
   l1ce.final  <- l1ce( y ~ x , sweep.out = ~ 1, standardize = TRUE,
                         bound = foundT, absolute.t = FALSE)
   predictors <- which( abs(l1ce.final$coefficients) > 0)
@@ -141,10 +163,12 @@ bestFit <- function( x, y, kFolds=5, stepSize = .05, printSteps = FALSE){
   }
   
   # Refitting the Model with best parameters from l1ce()
-  lm.final <- lm(y ~ x)
-  plot( y, predict( lm.final ) )
-  abline(0,1, col = 2, lwd = 3, lty = 2)
-  summary(lm.final)
+  #lm.final <- lm(y ~ x)
+  #plot( y, predict( lm.final ) )
+  #abline(0,1, col = 2, lwd = 3, lty = 2)
+  #summary(lm.final)
+  
+  invisible(l1ce.final)
   
 }
 
