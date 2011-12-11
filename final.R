@@ -6,6 +6,7 @@ main <- function(){
   # TODO: read in TF's, can use
   # we can access the rows in the ratios matrix by calling ratios[tf[i],]
   tfNames <- scan(file="justTFS.txt", what="character", sep="\n")
+  transFactors <- tfList(tfNames)
   
   # Since we don't have the clusters, this function is a placeholder
   clusters <- getClusters()
@@ -14,16 +15,21 @@ main <- function(){
   results <- list()
   
   for (i in 1:length(clusters)){
-    y <- mean(clusters[,i])
+    # this should be ONE vector, because it should be the mean of the cluster
+    y <- as.vector(ratios[i,])
+    
+    str(transFactors)
     
     # Here we could also look for the best correlated TF's too
-    x <- tfs
+    x <- getCorrPredictors(y,transFactors)
     
     # Do we want this to be tmp.l1ce or the final model?
     model <- bestFit(x,y)
     
     # add model to list of models for clusters
     results[[i]] <- model
+    str(model)
+    cat("SUCCESS")
   }
   
   # TODO: Save file into .rda for viz group?
@@ -36,31 +42,35 @@ main <- function(){
 
 getClusters <- function(){
   load("baa.ratios.rda")
-  clusters <- ratios
+  clusters <- as.vector(ratios[1,])
   invisible(clusters)
   
 }
 
 
 # A function that loads the data
-tfList <- function(tfNames, ratios){
+tfList <- function(tfNames){
+  load("baa.ratios.rda")
   miniList <- list()
   
   # This loop works
   for (i in 1:length(tfNames)){
-    #cat(i, "\n")
-    miniList[[i]] <- ratios[tfNames[i],]
+    # cat(i, "\n")
+    # remove as.vector for the names
+    miniList[[i]] <- as.vector(ratios[tfNames[i],])
   }
   
-  for (q in 1:length(z[[1]])){
-    rowTotal <- 0
-    for (l in 1:length(z)){
-      rowTotal = rowTotal+z[[l]][q]
-    }
-    cat("Mean is: ", (rowTotal/length(z)), "\n")
-  }
-    
-  invisible(miniList)
+  #for (q in 1:length(z[[1]])){
+  #  rowTotal <- 0
+  #  for (l in 1:length(z)){
+  #    rowTotal = rowTotal+z[[l]][q]
+  #  }
+  #  cat("Mean is: ", (rowTotal/length(z)), "\n")
+  #}
+   
+  # to return just the list
+  #invisible(miniList)
+  invisible(do.call(rbind,miniList))
   
 }
 
