@@ -36,6 +36,7 @@ main <- function(){
     results[[i]] <- model
     #str(model)
     cat("SUCCESS\n")
+    pause()
   }
   
   # TODO: Save file into .rda for viz group?
@@ -49,7 +50,7 @@ main <- function(){
 getClusters <- function(){
   load("baa.ratios.rda")
   clusters <- as.vector(ratios[1,])
-  clusters <- rbind(clusters,as.vector(ratios[1,]))
+  clusters <- rbind(clusters,as.vector(ratios[2,]))
   invisible(clusters)
   
 }
@@ -229,4 +230,11 @@ predict.from.lm <- function( lm1, x) {
      tmp.mat <- t( cbind( rep(1,n) , x) ) * coeff
      y.hat <-  apply( tmp.mat, 2, sum)
      invisible( y.hat ) 
+}
+
+# A simple pause function, following the example of the ppt
+pause <- function() {  
+  cat("Press <Enter> to continue...")
+  readline()
+  invisible()
 }
