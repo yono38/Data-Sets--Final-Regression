@@ -39,7 +39,7 @@ main <- function(){
   }
   
   # TODO: Save file into .rda for viz group?
-  str(results)
+  #str(results)
   invisible()
   
   
