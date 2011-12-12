@@ -2,17 +2,23 @@
 # Patrick Grennan
 # Jason Schapiro
 
+require(DBI)
+require(RSQLite)
 require(lars)
 require(lasso2)
 
 main <- function(){
-  load("baa.ratios.rda")
+ # load("baa.ratios.rda")
+ # this is a placeholder for now
+  dbFile <- "proj.sqlite3"
+  conn <<- dbConnect(dbDriver("SQLite"), dbname = dbFile)
   
   # we can access the rows in the ratios matrix by calling ratios[tf[i],]
   tfNames <- scan(file="justTFS.txt", what="character", sep="\n")
   transFactors <- tfList(tfNames)
   
   # Since we don't have the clusters, this function is a placeholder
+  # default is to run on 5 clusters
   clusters <- getClusters()
   
   # List to store the results
@@ -47,10 +53,24 @@ main <- function(){
   
 }
 
-getClusters <- function(){
-  load("baa.ratios.rda")
-  clusters <- as.vector(ratios[1,])
-  clusters <- rbind(clusters,as.vector(ratios[2,]))
+# parameter is the number of clusters to return
+# returns vectors with means/mediods
+getClusters <- function(numClust=5){
+	# randomly selects cluster row numbers
+	row.num <- sample(1:150, numClust)
+	# this will be a list of vectors that contain the means of the cluster at each time point
+	clusters <- list()
+	for (i in row.num) {
+ 	   sqlcmd <- paste("SELECT * FROM `baa_ratios` JOIN `k150` ON `row_names` = `row` WHERE `k150.out`=", i, sep="")
+ 	   data <- dbGetPreparedQuery(
+		conn,	sqlcmd, bind.data = data.frame(cluster)
+		)
+		# Not sure what this query returns
+		# But next step is to take mean of each of the time points for the cluster and return this as a vector of means
+		# Then add this to the clusters list
+  		cluster.mean <- colmeans(data)
+  		clusters <- rbind(clusters,cluster.mean)
+  }
   invisible(clusters)
   
 }
