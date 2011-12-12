@@ -1,9 +1,13 @@
-# Final Project Mockup
+# Final Project: Regression
+# Patrick Grennan
+# Jason Schapiro
+
 require(lars)
 require(lasso2)
 
 main <- function(){
-  # TODO: read in TF's, can use
+  load("baa.ratios.rda")
+  
   # we can access the rows in the ratios matrix by calling ratios[tf[i],]
   tfNames <- scan(file="justTFS.txt", what="character", sep="\n")
   transFactors <- tfList(tfNames)
@@ -14,26 +18,28 @@ main <- function(){
   # List to store the results
   results <- list()
   
-  for (i in 1:length(clusters)){
+  # this will probably be changed to length(clusters)
+  for (i in 1:NROW(clusters)){
     # this should be ONE vector, because it should be the mean of the cluster
-    y <- as.vector(ratios[i,])
+    y <- as.vector(clusters[i,])
     
-    str(transFactors)
+    #str(transFactors)
     
     # Here we could also look for the best correlated TF's too
-    x <- getCorrPredictors(y,transFactors)
+    x <- predictors(y,transFactors)
     
+    # we have to put in the TRANSPOSE of x
     # Do we want this to be tmp.l1ce or the final model?
-    model <- bestFit(x,y)
+    model <- bestFit(t(x),y)
     
     # add model to list of models for clusters
     results[[i]] <- model
-    str(model)
-    cat("SUCCESS")
+    #str(model)
+    cat("SUCCESS\n")
   }
   
   # TODO: Save file into .rda for viz group?
-  
+  str(results)
   invisible()
   
   
@@ -43,6 +49,7 @@ main <- function(){
 getClusters <- function(){
   load("baa.ratios.rda")
   clusters <- as.vector(ratios[1,])
+  clusters <- rbind(clusters,as.vector(ratios[1,]))
   invisible(clusters)
   
 }
@@ -75,7 +82,7 @@ tfList <- function(tfNames){
 }
 
   
-getCorrPredictors <- function(y, tfs) {
+predictors <- function(y, tfs) {
   cors <- double()
 	for (i in 1:dim(tfs)[1]) {
 		t = tfs[i,]
@@ -166,16 +173,16 @@ bestFit <- function( x, y, kFolds=5, stepSize = .05, printSteps = FALSE){
   predictors <- which( abs(l1ce.final$coefficients) > 0)
   predictors <- predictors[predictors != 1] - 1
       
-  cat("The number of predictors is: ", length(predictors))
+  cat("The number of predictors is: ", length(predictors), "\n")
 
   if ( length(predictors) < dim(x)[2] ) { 
       x <- as.matrix( x[,predictors] )
   }
   
   # Refitting the Model with best parameters from l1ce()
-  #lm.final <- lm(y ~ x)
-  #plot( y, predict( lm.final ) )
-  #abline(0,1, col = 2, lwd = 3, lty = 2)
+  lm.final <- lm(y ~ x)
+  plot( y, predict( lm.final ) )
+  abline(0,1, col = 2, lwd = 3, lty = 2)
   #summary(lm.final)
   
   invisible(l1ce.final)
