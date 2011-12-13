@@ -7,10 +7,11 @@ require(RSQLite)
 require(lars)
 require(lasso2)
 
+
 main <- function(){
  # load("baa.ratios.rda")
  # this is a placeholder for now
-  dbFile <- "proj.sqlite3"
+  dbFile <- "clara.sqlite"
   conn <<- dbConnect(dbDriver("SQLite"), dbname = dbFile)
   
   # we can access the rows in the ratios matrix by calling ratios[tf[i],]
@@ -57,21 +58,19 @@ main <- function(){
 # returns vectors with means/mediods
 getClusters <- function(numClust=5){
 	# randomly selects cluster row numbers
-	row.num <- sample(1:150, numClust)
+	row.num <- sample(1:175, numClust)
 	# this will be a list of vectors that contain the means of the cluster at each time point
 	clusters <- list()
 	for (i in row.num) {
- 	   sqlcmd <- paste("SELECT * FROM `baa_ratios` JOIN `k150` ON `row_names` = `row` WHERE `k150.out`=", i, sep="")
- 	   data <- dbGetPreparedQuery(
-		conn,	sqlcmd, bind.data = data.frame(cluster)
-		)
+ 	   sqlcmd <- paste("select * from ba_ratios inner join k173 on ba_ratios.row_names=k173.row_names where out=", i, sep="")
+ 	   data <- dbGetQuery(conn, sqlcmd)
 		# Not sure what this query returns
 		# But next step is to take mean of each of the time points for the cluster and return this as a vector of means
 		# Then add this to the clusters list
-  		cluster.mean <- colmeans(data)
+  		cluster.mean <- colMeans(data)
   		clusters <- rbind(clusters,cluster.mean)
   }
-  invisible(clusters)
+  str(clusters)
   
 }
 
